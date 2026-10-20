@@ -152,9 +152,8 @@
           if(!check.ok)continue;
           const state=await check.json(),deploymentState=state.state||state.status;
           if(deploymentState==='errored'||deploymentState==='failed')throw Error('GitHub 发布失败，请稍后重试');
-          if(deploymentState==='built'){
-            const live=await fetchPublished();
-            if(configKey(live)===configKey(snapshot)){publishedPrizes=live;completed=true;break}
+          if(deploymentState==='built'||attempt>=4){
+            try{const live=await fetchPublished();if(configKey(live)===configKey(snapshot)){publishedPrizes=live;completed=true;break}}catch{}
           }
         }
         if(!completed)throw Error('已上传，发布仍在进行。稍后刷新查看；顾客链接保持不变');
